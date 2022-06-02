@@ -1,0 +1,11 @@
+# API metadata
+API_VERSION=v1
+
+# JWT configs
+JWT_SECRET=36c318d8688f27d4ac10522c0f4b1c80
+
+# MongoDB configs
+MONGO_URI=
+
+# Client configs
+FRONTEND_DOMAIN=
