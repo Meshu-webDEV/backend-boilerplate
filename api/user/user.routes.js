@@ -1,20 +1,20 @@
-const router = require("express").Router();
+const router = require('express').Router();
 
 // Controller
-const { signUp, signIn, getUsers, getMe } = require("./user.controller");
+const { signUp, signIn, getUsers, getMe } = require('./user.controller');
 
 // Utils
-const { jwtTokenPayload } = require("../../lib/jwt");
-const { isAuthorized } = require("../../middlewares");
-const { WEB_SERVER } = require("../../lib/configs");
+const { jwtTokenPayload } = require('../../lib/jwt');
+const { isAuthorized } = require('../../middlewares');
+const { WEB_SERVER } = require('../../lib/configs');
 
 // Validation
-const validate = require("../../lib/validation");
-const signinSchema = require("../../lib/validation/schemas/signin");
-const signupSchema = require("../../lib/validation/schemas/signup");
+const validate = require('../../lib/validation');
+const signinSchema = require('../../lib/validation/schemas/user.routes/post.signin');
+const signupSchema = require('../../lib/validation/schemas/user.routes/post.signup');
 
 // GET ../v1/users/
-router.get("/", isAuthorized, async (req, res, next) => {
+router.get('/', isAuthorized, async (req, res, next) => {
   try {
     const result = await getUsers();
     const { _id } = await jwtTokenPayload(req.cookies.token);
@@ -25,8 +25,8 @@ router.get("/", isAuthorized, async (req, res, next) => {
   }
 });
 
-// GET ../v1/users/
-router.get("/me", isAuthorized, async (req, res, next) => {
+// GET ../v1/users/me
+router.get('/me', isAuthorized, async (req, res, next) => {
   try {
     const { _id } = await jwtTokenPayload(req.cookies.token);
     const me = await getMe(_id);
@@ -38,7 +38,7 @@ router.get("/me", isAuthorized, async (req, res, next) => {
 });
 
 // POST ../v1/users/signin
-router.post("/signin", async (req, res, next) => {
+router.post('/signin', async (req, res, next) => {
   try {
     // Validate
     await validate(req.body, signinSchema);
@@ -46,10 +46,10 @@ router.post("/signin", async (req, res, next) => {
     const { username, token } = await signIn(req.body);
     return res
       .status(200)
-      .cookie("token", token, {
-        secure: WEB_SERVER.ENV === "production" ? true : false,
-        httpOnly: WEB_SERVER.ENV === "production" ? true : false,
-        sameSite: "none", //on production
+      .cookie('token', token, {
+        secure: WEB_SERVER.ENV === 'production' ? true : false,
+        httpOnly: WEB_SERVER.ENV === 'production' ? true : false,
+        sameSite: 'none', //on production
         maxAge: 1000 * 60 * 60 * 24 * 14, // Two Weeks
       })
       .json({ username });
@@ -59,7 +59,7 @@ router.post("/signin", async (req, res, next) => {
 });
 
 // POST ../v1/users/signup
-router.post("/signup", async (req, res, next) => {
+router.post('/signup', async (req, res, next) => {
   try {
     // Validate
     await validate(req.body, signupSchema);
@@ -68,10 +68,10 @@ router.post("/signup", async (req, res, next) => {
 
     return res
       .status(201)
-      .cookie("token", token, {
-        secure: WEB_SERVER.ENV === "production" ? true : false,
-        httpOnly: WEB_SERVER.ENV === "production" ? true : false,
-        sameSite: "none", //on production
+      .cookie('token', token, {
+        secure: WEB_SERVER.ENV === 'production' ? true : false,
+        httpOnly: WEB_SERVER.ENV === 'production' ? true : false,
+        sameSite: 'none', //on production
         maxAge: 1000 * 60 * 60 * 24 * 14, // Two Weeks
       })
       .json({ username });
@@ -80,13 +80,10 @@ router.post("/signup", async (req, res, next) => {
   }
 });
 
-// POST ../v1/users/signup
-router.get("/signout", async (req, res, next) => {
+// POST ../v1/users/signout
+router.get('/signout', async (req, res, next) => {
   try {
-    return res
-      .status(200)
-      .clearCookie("token")
-      .json({ status: 1, message: "Successfully signed out." });
+    return res.status(200).clearCookie('token').json({ status: 1, message: 'Successfully signed out.' });
   } catch (error) {
     return next(error);
   }
